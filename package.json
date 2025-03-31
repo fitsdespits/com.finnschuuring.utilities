@@ -4,15 +4,4 @@
   "displayName": "Finn Schuuring Utilities",
   "description": "Cool Tools.",
   "unity": "6000.0"
- },
- "keywords": [
-    "Finn",
-    "Schuuring",
-    "Utility"
-  ],
-  "author": {
-    "name": "Finn Schuuring",
-    "email": "finnschuuring.gamedev@gmail.com",
-    "url": "https://sites.google.com/view/finnschuuring/"
-  }
 }
