@@ -71,9 +71,9 @@
                 Debug.LogError($"Cannot clone {originalAsset.name}, as cloning of type {typeof(T).Name} has not been enabled.");
                 return null;
             }
-            T assetClone = UnityEngine.Object.Instantiate(originalAsset);
-            runtimeAssets.Add(assetClone);
-            return assetClone;
+            T cloneAsset = UnityEngine.Object.Instantiate(originalAsset);
+            runtimeAssets.Add(cloneAsset);
+            return cloneAsset;
         }
     }
 }
