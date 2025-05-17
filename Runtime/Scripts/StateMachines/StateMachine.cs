@@ -8,6 +8,7 @@
 
         protected readonly List<State> states = new();
         protected readonly List<State> queuedStates = new();
+        protected readonly List<StateData> queuedStateData = new();
 
         public void GoToState<T>() where T : State {
             GoToState(GetOrCreateState<T>());
@@ -42,13 +43,14 @@
         }
 
         private void QueueState(State state, StateQueueMode queueMode = StateQueueMode.Last, StateData data = null) {
-            state.SetData(this, data);
             switch (queueMode) {
                 case StateQueueMode.First:
                     queuedStates.Insert(0, state);
+                    queuedStateData.Insert(0, data);
                     break;
                 case StateQueueMode.Last:
                     queuedStates.Add(state);
+                    queuedStateData.Add(data);
                     break;
             }
         }
@@ -59,15 +61,15 @@
                 return;
             }
             State nextQueuedState = queuedStates.First();
+            StateData nextQueuedStateData = queuedStateData.First();
             queuedStates.Remove(nextQueuedState);
-            GoToState(nextQueuedState);
+            queuedStateData.Remove(nextQueuedStateData);
+            GoToState(nextQueuedState, nextQueuedStateData);
         }
 
         public void ClearQueue() {
-            foreach (var queuedState in queuedStates) {
-                queuedState.ResetData();
-            }
             queuedStates.Clear();
+            queuedStateData.Clear();
         }
 
         private State GetOrCreateState<T>() where T : State {
@@ -75,8 +77,9 @@
             if (state == null) {
                 state = gameObject.FindInDirectChildren<T>();
                 if (state == null) {
-                    GameObject obj = new();
-                    obj.name = typeof(T).Name;
+                    GameObject obj = new() {
+                        name = typeof(T).Name
+                    };
                     obj.transform.SetParent(transform, false);
                     state = obj.AddComponent(typeof(T)) as State;
                     states.Add(state);
