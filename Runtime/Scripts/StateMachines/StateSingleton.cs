@@ -2,8 +2,6 @@
     using UnityEngine;
 
     public abstract class StateSingleton<T> : State where T : StateSingleton<T> {
-        private static T _instance;
-
         public static T Instance { get {
                 if (_instance == null) {
                     _instance = FindFirstObjectByType<T>();
@@ -14,5 +12,7 @@
                 return _instance;
             }
         }
+
+        private static T _instance;
     }
 }

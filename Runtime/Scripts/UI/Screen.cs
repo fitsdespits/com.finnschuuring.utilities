@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using UnityEngine;
 
-    public abstract class CanvasScreen<T> : MonoBehaviourSingleton<T> where T : CanvasScreen<T> {
+    public abstract class Screen<T> : MonoBehaviourSingleton<T> where T : Screen<T> {
         [field: SerializeField] public RectTransform WidgetContainer { get; private set; }
         public abstract bool EnableOnAwake { get; }
         public bool IsEnabled => WidgetContainer != null && WidgetContainer.gameObject.activeSelf;

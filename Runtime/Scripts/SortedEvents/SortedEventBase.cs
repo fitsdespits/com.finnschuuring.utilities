@@ -4,28 +4,28 @@
     using System.Linq;
 
     public class SortedEventBase<T> {
-        protected List<KeyValuePair<T, int>> actions = new();
+        protected List<KeyValuePair<T, int>> _subscribers = new();
 
         public void Subscribe(T action, int order = int.MaxValue) {
-            actions.Add(new KeyValuePair<T, int>(action, order));
-            actions = actions.OrderBy(key => key.Value).ToList();
+            _subscribers.Add(new KeyValuePair<T, int>(action, order));
+            _subscribers = _subscribers.OrderBy(key => key.Value).ToList();
         }
 
         public void Unsubscribe(T action) {
-            actions.Remove(actions.Find(x => x.Key.Equals(action)));
+            _subscribers.Remove(_subscribers.Find(x => x.Key.Equals(action)));
         }
 
         public void UnsubscribeAll() {
-            actions.Clear();
+            _subscribers.Clear();
         }
 
         protected void InvokeInternal(Action<T> invokeAction) {
-            int actionsCount = actions.Count;
+            int actionsCount = _subscribers.Count;
             for (int i = 0; i < actionsCount; i++) {
-                if (i > actions.Count - 1) break;
-                var action = actions[i];
-                invokeAction(action.Key);
-                if (i <= actions.Count - 1 && !action.Equals(actions[i])) i--;
+                if (i > _subscribers.Count - 1) break;
+                var subscriber = _subscribers[i];
+                invokeAction(subscriber.Key);
+                if (i <= _subscribers.Count - 1 && !subscriber.Equals(_subscribers[i])) i--;
             }
         }
     }

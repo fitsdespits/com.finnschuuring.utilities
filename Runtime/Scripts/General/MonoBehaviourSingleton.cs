@@ -8,20 +8,20 @@
     }
 
     public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviourSingleton<T> {
-        private static readonly Dictionary<Type, MonoBehaviourSingleton> singletonInstances = new();
-
         public static T Instance {
             get {
-                singletonInstances.TryGetValue(typeof(T), out MonoBehaviourSingleton singletonInstance);
+                _instances.TryGetValue(typeof(T), out MonoBehaviourSingleton singletonInstance);
                 T instance = singletonInstance as T;
                 if (instance == null) {
-                    singletonInstances.Remove(typeof(T));
+                    _instances.Remove(typeof(T));
                     instance = FindFirstObjectByType<T>();
                     instance.name = typeof(T).Name;
-                    singletonInstances.Add(typeof(T), singletonInstance);
+                    _instances.Add(typeof(T), singletonInstance);
                 }
                 return instance;
             }
         }
+
+        private static readonly Dictionary<Type, MonoBehaviourSingleton> _instances = new();
     }
 }

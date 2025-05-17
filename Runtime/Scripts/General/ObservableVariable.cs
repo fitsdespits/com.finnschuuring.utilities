@@ -12,12 +12,21 @@
                 }
             }
         }
+
         public SortedEvent<T, T> OnValueChanged { get; private set; } = new();
 
         private T _value = default;
 
-        public void Observe(Action<T, T> action) {
-            OnValueChanged.Subscribe(action);
+        public ObservableVariable() {
+            
+        }
+
+        public ObservableVariable(T value) {
+            Value = value;
+        }
+
+        public void Observe(Action<T, T> action, int index = int.MaxValue) {
+            OnValueChanged.Subscribe(action, index);
         }
 
         public void Unobserve(Action<T, T> action) {

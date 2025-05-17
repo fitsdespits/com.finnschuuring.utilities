@@ -4,16 +4,16 @@
     using UnityEngine;
 
     public class AssetLibrary<TLibrary, TAsset> : Library<TLibrary>, IAssetLibrary where TLibrary : Library<TLibrary> where TAsset : IAsset {
-        private static List<TAsset> assets = new();
+        private static List<TAsset> _assets = new();
 
         public void Initialize() {
-            assets.Clear();
-            assets = AssetHelper.GetAllOfType<TAsset>();
+            _assets.Clear();
+            _assets = AssetHelper.GetAllOfType<TAsset>();
             OnInitialize();
         }
 
         public bool TryFind(Guid guid, out TAsset asset) {
-            asset = assets.Find(x => x.Guid.Equals(guid));
+            asset = _assets.Find(x => x.Guid.Equals(guid));
             if (asset == null) {
                 Debug.LogError($"Could not find {guid} in {name}.");
                 return false;
@@ -22,7 +22,7 @@
         }
 
         public List<TAsset> GetAll() {
-            return assets;
+            return _assets;
         }
 
         public virtual void OnInitialize() {

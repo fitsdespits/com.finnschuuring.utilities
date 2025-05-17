@@ -6,9 +6,9 @@
         protected State CurrentState { get; private set; } = null;
         public SortedEvent<State> OnStateChanged { get; private set; } = new();
 
-        protected readonly List<State> states = new();
-        protected readonly List<State> queuedStates = new();
-        protected readonly List<StateData> queuedStateData = new();
+        protected readonly List<State> _states = new();
+        protected readonly List<State> _queuedStates = new();
+        protected readonly List<StateData> _queuedStateData = new();
 
         public void GoToState<T>() where T : State {
             GoToState(GetOrCreateState<T>());
@@ -45,35 +45,35 @@
         private void QueueState(State state, StateQueueMode queueMode = StateQueueMode.Last, StateData data = null) {
             switch (queueMode) {
                 case StateQueueMode.First:
-                    queuedStates.Insert(0, state);
-                    queuedStateData.Insert(0, data);
+                    _queuedStates.Insert(0, state);
+                    _queuedStateData.Insert(0, data);
                     break;
                 case StateQueueMode.Last:
-                    queuedStates.Add(state);
-                    queuedStateData.Add(data);
+                    _queuedStates.Add(state);
+                    _queuedStateData.Add(data);
                     break;
             }
         }
 
         public void AdvanceQueue() {
-            if (queuedStates == null || queuedStates.Count == 0) {
+            if (_queuedStates == null || _queuedStates.Count == 0) {
                 GoToNoState();
                 return;
             }
-            State nextQueuedState = queuedStates.First();
-            StateData nextQueuedStateData = queuedStateData.First();
-            queuedStates.Remove(nextQueuedState);
-            queuedStateData.Remove(nextQueuedStateData);
+            State nextQueuedState = _queuedStates.First();
+            StateData nextQueuedStateData = _queuedStateData.First();
+            _queuedStates.Remove(nextQueuedState);
+            _queuedStateData.Remove(nextQueuedStateData);
             GoToState(nextQueuedState, nextQueuedStateData);
         }
 
         public void ClearQueue() {
-            queuedStates.Clear();
-            queuedStateData.Clear();
+            _queuedStates.Clear();
+            _queuedStateData.Clear();
         }
 
         private State GetOrCreateState<T>() where T : State {
-            State state = states.Find(x => x.GetType() == typeof(T));
+            State state = _states.Find(x => x.GetType() == typeof(T));
             if (state == null) {
                 state = gameObject.FindInDirectChildren<T>();
                 if (state == null) {
@@ -82,7 +82,7 @@
                     };
                     obj.transform.SetParent(transform, false);
                     state = obj.AddComponent(typeof(T)) as State;
-                    states.Add(state);
+                    _states.Add(state);
                 }
             }
             return state;

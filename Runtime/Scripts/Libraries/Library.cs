@@ -3,17 +3,24 @@
     using System.Collections.Generic;
     using UnityEngine;
 
-    public abstract class Library<T> : LibraryBase where T : Library<T> {
-        private protected readonly static Dictionary<Type, T> libraryInstances = new();
+    public abstract class Library : ScriptableObjectAsset {
+
+    }
+
+    public abstract class Library<T> : ScriptableObjectAsset where T : Library<T> {
         public static T Instance {
             get {
-                libraryInstances.TryGetValue(typeof(T), out T libraryInstance);
+                _instances.TryGetValue(typeof(T), out T libraryInstance);
                 if (libraryInstance == null) {
                     libraryInstance = Resources.Load($"Libraries/{typeof(T).Name}") as T;
-                    libraryInstances.Add(typeof(T), libraryInstance);
+                    _instances.Add(typeof(T), libraryInstance);
                 }
                 return libraryInstance;
             }
         }
+
+        private protected readonly static Dictionary<Type, T> _instances = new();
+
+        public override bool IsInstantiatable => false;
     }
 }

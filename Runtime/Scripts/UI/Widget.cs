@@ -1,9 +1,8 @@
 ﻿namespace FinnSchuuring.Utilities {
     using System.Threading.Tasks;
-    using UnityEngine;
     using UnityEngine.EventSystems;
 
-    public abstract class CanvasWidget : MonoBehaviourAsset, ICanvasWidget, IPointerDownHandler, IPointerUpHandler {
+    public abstract class Widget : MonoBehaviourAsset, IWidget, IPointerDownHandler, IPointerUpHandler {
         public void OnPointerDown(PointerEventData eventData) {
             OnClickDown();
         }

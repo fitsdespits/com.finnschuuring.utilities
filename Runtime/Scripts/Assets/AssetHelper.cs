@@ -4,33 +4,33 @@
     using UnityEngine;
 
     public static class AssetHelper {
-        private readonly static List<IAsset> scriptableObjectAssets = new();
-        private readonly static List<IAsset> monoBehaviourAssets = new();
+        private readonly static List<IAsset> _scriptableObjectAssets = new();
+        private readonly static List<IAsset> _monoBehaviourAssets = new();
 
         public static void CacheScriptableObjectAssets() {
-            AssetHelper.scriptableObjectAssets.Clear();
+            _scriptableObjectAssets.Clear();
             IAsset[] scriptableObjectAssets = Resources.LoadAll<ScriptableObjectAsset>("");
             foreach (var scriptableObjectAsset in scriptableObjectAssets) {
-                AssetHelper.scriptableObjectAssets.Add(scriptableObjectAsset);
+                _scriptableObjectAssets.Add(scriptableObjectAsset);
             }
         }
 
         public static void CacheMonoBehaviourAssets() {
-            AssetHelper.monoBehaviourAssets.Clear();
+            _monoBehaviourAssets.Clear();
             IAsset[] monoBehaviourAssets = Resources.LoadAll<MonoBehaviourAsset>("");
             foreach (var monoBehaviourAsset in monoBehaviourAssets) {
-                AssetHelper.monoBehaviourAssets.Add(monoBehaviourAsset);
+                _monoBehaviourAssets.Add(monoBehaviourAsset);
             }
         }
 
         public static List<T> GetAllOfType<T>() where T : IAsset {
             List<T> assets = new();
-            foreach (var scriptableObjectAsset in scriptableObjectAssets) {
+            foreach (var scriptableObjectAsset in _scriptableObjectAssets) {
                 if (scriptableObjectAsset is T asset) {
                     assets.Add(asset);
                 }
             }
-            foreach (var monoBehaviourAsset in monoBehaviourAssets) {
+            foreach (var monoBehaviourAsset in _monoBehaviourAssets) {
                 if (monoBehaviourAsset is T asset) {
                     assets.Add(asset);
                 }
@@ -40,13 +40,13 @@
 
         public static bool TryFind(Guid Guid, out IAsset asset) {
             asset = null;
-            foreach (var scriptableObjectAsset in scriptableObjectAssets) {
+            foreach (var scriptableObjectAsset in _scriptableObjectAssets) {
                 if (scriptableObjectAsset.Guid == Guid) {
                     asset = scriptableObjectAsset;
                     return true;
                 }
             }
-            foreach (var monoBehaviourAsset in monoBehaviourAssets) {
+            foreach (var monoBehaviourAsset in _monoBehaviourAssets) {
                 if (monoBehaviourAsset.Guid == Guid) {
                     asset = monoBehaviourAsset;
                     return true;
@@ -81,13 +81,13 @@
                 return false;
             }
             instantiatedAsset = UnityEngine.Object.Instantiate(asset);
-            scriptableObjectAssets.Add(instantiatedAsset);
+            _scriptableObjectAssets.Add(instantiatedAsset);
             return instantiatedAsset;
         }
 
         private static bool TryInstantiateMonoBehaviourAsset<T>(T asset, out T instantiatedAsset) where T : MonoBehaviourAsset {
             instantiatedAsset = UnityEngine.Object.Instantiate(asset);
-            monoBehaviourAssets.Add(instantiatedAsset);
+            _monoBehaviourAssets.Add(instantiatedAsset);
             return true;
         }
     }
