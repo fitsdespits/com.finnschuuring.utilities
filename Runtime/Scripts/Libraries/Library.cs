@@ -10,12 +10,12 @@
     public abstract class Library<T> : ScriptableObjectAsset where T : Library<T> {
         public static T Instance {
             get {
-                _instances.TryGetValue(typeof(T), out T libraryInstance);
-                if (libraryInstance == null) {
-                    libraryInstance = Resources.Load($"Libraries/{typeof(T).Name}") as T;
-                    _instances.Add(typeof(T), libraryInstance);
+                _instances.TryGetValue(typeof(T), out T value);
+                if (value == null) {
+                    value = Resources.Load($"Libraries/{typeof(T).Name}") as T;
+                    _instances.Add(typeof(T), value);
                 }
-                return libraryInstance;
+                return value;
             }
         }
 

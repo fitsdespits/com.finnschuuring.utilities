@@ -10,13 +10,13 @@
     public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviourSingleton<T> {
         public static T Instance {
             get {
-                _instances.TryGetValue(typeof(T), out MonoBehaviourSingleton singletonInstance);
-                T instance = singletonInstance as T;
+                _instances.TryGetValue(typeof(T), out MonoBehaviourSingleton value);
+                T instance = value as T;
                 if (instance == null) {
                     _instances.Remove(typeof(T));
                     instance = FindFirstObjectByType<T>();
                     instance.name = typeof(T).Name;
-                    _instances.Add(typeof(T), singletonInstance);
+                    _instances.Add(typeof(T), value);
                 }
                 return instance;
             }

@@ -3,16 +3,20 @@
     using System.Threading.Tasks;
     using UnityEngine;
 
-    public abstract class Screen<T> : MonoBehaviourSingleton<T> where T : Screen<T> {
+    public abstract class Screen<T> : MonoBehaviourSingleton<T>, ISceneLoadable where T : Screen<T> {
         [field: SerializeField] public RectTransform WidgetContainer { get; private set; }
         public abstract bool EnableOnAwake { get; }
         public bool IsEnabled => WidgetContainer != null && WidgetContainer.gameObject.activeSelf;
 
-        private void Awake() {
-            Initialize();
+        public async Task LoadAsync() {
+            await InitializeAsync();
         }
 
-        private async void Initialize() {
+        public async Task UnloadAsync() {
+            await Task.CompletedTask;
+        }
+
+        private async Task InitializeAsync() {
             OnInitialize();
             if (EnableOnAwake) {
                 await EnableAsync();
