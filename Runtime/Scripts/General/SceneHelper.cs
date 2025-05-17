@@ -10,6 +10,7 @@
                 LoadSceneAsync(sceneTo, progress, 0.25f),
                 UnloadSceneLoadables(sceneFrom, progress, 0.25f),
                 UnloadSceneAsync(sceneFrom, progress, 0.25f),
+                SetActiveSceneAsync(sceneTo),
                 LoadSceneLoadables(sceneTo, progress, 0.25f)
             };
             foreach (var task in tasks) {
@@ -28,6 +29,11 @@
                 await SceneManager.UnloadSceneAsync((Scene)scene);
             }
             progress.Value += progressIncrement;
+            await Task.Yield();
+        }
+
+        public static async Task SetActiveSceneAsync(Scene scene) {
+            SceneManager.SetActiveScene(scene);
             await Task.Yield();
         }
 
