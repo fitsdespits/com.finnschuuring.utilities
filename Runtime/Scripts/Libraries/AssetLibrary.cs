@@ -8,7 +8,7 @@
 
         public void Initialize() {
             assets.Clear();
-            assets = AssetHelper.GetAllOfTypeInProject<TAsset>();
+            assets = AssetHelper.GetAllOfType<TAsset>();
             OnInitialize();
         }
 

@@ -4,76 +4,91 @@
     using UnityEngine;
 
     public static class AssetHelper {
-        private readonly static List<IAsset> projectAssets = new();
-        private readonly static List<IAsset> runtimeAssets = new();
+        private readonly static List<IAsset> scriptableObjectAssets = new();
+        private readonly static List<IAsset> monoBehaviourAssets = new();
 
-        public static void Initialize() {
-            runtimeAssets.Clear();
-            CacheProjectAssets();
-        }
-
-        private static void CacheProjectAssets() {
-            projectAssets.Clear();
+        public static void CacheScriptableObjectAssets() {
+            AssetHelper.scriptableObjectAssets.Clear();
             IAsset[] scriptableObjectAssets = Resources.LoadAll<ScriptableObjectAsset>("");
+            foreach (var scriptableObjectAsset in scriptableObjectAssets) {
+                AssetHelper.scriptableObjectAssets.Add(scriptableObjectAsset);
+            }
+        }
+
+        public static void CacheMonoBehaviourAssets() {
+            AssetHelper.monoBehaviourAssets.Clear();
             IAsset[] monoBehaviourAssets = Resources.LoadAll<MonoBehaviourAsset>("");
-            foreach (var asset in scriptableObjectAssets) {
-                projectAssets.Add(asset);
-            }
-            foreach (var asset in monoBehaviourAssets) {
-                projectAssets.Add(asset);
+            foreach (var monoBehaviourAsset in monoBehaviourAssets) {
+                AssetHelper.monoBehaviourAssets.Add(monoBehaviourAsset);
             }
         }
 
-        public static List<T> GetAllOfTypeInProject<T>() where T : IAsset {
+        public static List<T> GetAllOfType<T>() where T : IAsset {
             List<T> assets = new();
-            foreach (var projectAsset in projectAssets) {
-                if (projectAsset is T asset) {
+            foreach (var scriptableObjectAsset in scriptableObjectAssets) {
+                if (scriptableObjectAsset is T asset) {
+                    assets.Add(asset);
+                }
+            }
+            foreach (var monoBehaviourAsset in monoBehaviourAssets) {
+                if (monoBehaviourAsset is T asset) {
                     assets.Add(asset);
                 }
             }
             return assets;
         }
 
-        public static List<T> GetAllOfTypeInRuntime<T>() where T : IAsset {
-            List<T> assets = new();
-            foreach (var runtimeAsset in runtimeAssets) {
-                if (runtimeAsset is T asset) {
-                    assets.Add(asset);
+        public static bool TryFind(Guid Guid, out IAsset asset) {
+            asset = null;
+            foreach (var scriptableObjectAsset in scriptableObjectAssets) {
+                if (scriptableObjectAsset.Guid == Guid) {
+                    asset = scriptableObjectAsset;
+                    return true;
                 }
             }
-            return assets;
-        }
-
-        public static bool TryFindInProject(Guid Guid, out IAsset asset) {
-            asset = null;
-            foreach (var projectAsset in projectAssets) {
-                if (projectAsset.Guid == Guid) {
-                    asset = projectAsset;
+            foreach (var monoBehaviourAsset in monoBehaviourAssets) {
+                if (monoBehaviourAsset.Guid == Guid) {
+                    asset = monoBehaviourAsset;
                     return true;
                 }
             }
             return false;
         }
 
-        public static bool TryFindInRuntime(Guid Guid, out IAsset asset) {
-            asset = null;
-            foreach (var runtimeAsset in runtimeAssets) {
-                if (runtimeAsset.Guid == Guid) {
-                    asset = runtimeAsset;
+        public static bool TryInstantiate<T>(T asset, out T instantiatedAsset) where T : class, IAsset {
+            instantiatedAsset = default;
+            if (asset is ScriptableObjectAsset scriptableObjectAsset) {
+                if (TryInstantiateScriptableObjectAsset(scriptableObjectAsset, out var result)) {
+                    instantiatedAsset = result as T;
                     return true;
                 }
+                return false;
+            }
+            if (asset is MonoBehaviourAsset monoBehaviourAsset) {
+                if (TryInstantiateMonoBehaviourAsset(monoBehaviourAsset, out var result)) {
+                    instantiatedAsset = result as T;
+                    return true;
+                }
+                return false;
             }
             return false;
         }
 
-        public static T CloneScriptableObjectAsset<T>(T originalAsset) where T : ScriptableObjectAsset {
-            if (!originalAsset.IsCloneable) {
-                Debug.LogError($"Cannot clone {originalAsset.name}, as cloning of type {typeof(T).Name} has not been enabled.");
-                return null;
+        private static bool TryInstantiateScriptableObjectAsset<T>(T asset, out T instantiatedAsset) where T : ScriptableObjectAsset {
+            instantiatedAsset = null;
+            if (!asset.IsInstantiatable) {
+                Debug.LogError($"Cannot instantiate {asset.name}. Instantiating of type {typeof(T).Name} has not been enabled.", asset);
+                return false;
             }
-            T cloneAsset = UnityEngine.Object.Instantiate(originalAsset);
-            runtimeAssets.Add(cloneAsset);
-            return cloneAsset;
+            instantiatedAsset = UnityEngine.Object.Instantiate(asset);
+            scriptableObjectAssets.Add(instantiatedAsset);
+            return instantiatedAsset;
+        }
+
+        private static bool TryInstantiateMonoBehaviourAsset<T>(T asset, out T instantiatedAsset) where T : MonoBehaviourAsset {
+            instantiatedAsset = UnityEngine.Object.Instantiate(asset);
+            monoBehaviourAssets.Add(instantiatedAsset);
+            return true;
         }
     }
 }

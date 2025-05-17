@@ -3,6 +3,5 @@
 
     public interface IAsset : IGuidable {
         public abstract Object Object { get; }
-        public abstract bool IsCloneable { get; }
     }
 }

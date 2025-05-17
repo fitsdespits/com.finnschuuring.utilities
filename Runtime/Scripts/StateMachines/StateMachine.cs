@@ -4,12 +4,10 @@
 
     public abstract class StateMachine : State {
         protected State CurrentState { get; private set; } = null;
+        public SortedEvent<State> OnStateChanged { get; private set; } = new();
 
         protected readonly List<State> states = new();
-
         protected readonly List<State> queuedStates = new();
-
-        public readonly SortedEvent<State> OnStateChanged = new();
 
         public void GoToState<T>() where T : State {
             GoToState(GetOrCreateState<T>());
@@ -35,21 +33,21 @@
             GoToState(null);
         }
 
-        public void QueueState<T>(QueueMode queueMode) where T : State {
+        public void QueueState<T>(StateQueueMode queueMode) where T : State {
             QueueState(GetOrCreateState<T>(), queueMode);
         }
 
-        public void QueueState<T>(QueueMode queueMode, params object[] data) where T : State {
+        public void QueueState<T>(StateQueueMode queueMode, params object[] data) where T : State {
             QueueState(GetOrCreateState<T>(), queueMode, new StateData(data));
         }
 
-        private void QueueState(State state, QueueMode queueMode = QueueMode.Last, StateData data = null) {
+        private void QueueState(State state, StateQueueMode queueMode = StateQueueMode.Last, StateData data = null) {
             state.SetData(this, data);
             switch (queueMode) {
-                case QueueMode.First:
+                case StateQueueMode.First:
                     queuedStates.Insert(0, state);
                     break;
-                case QueueMode.Last:
+                case StateQueueMode.Last:
                     queuedStates.Add(state);
                     break;
             }
