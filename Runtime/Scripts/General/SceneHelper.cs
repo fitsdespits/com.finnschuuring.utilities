@@ -5,40 +5,41 @@
     using UnityEngine.SceneManagement;
 
     public static class SceneHelper {
-        public static async Task TransitionAsync(Scene? sceneFrom, Scene sceneTo, ObservableVariable<float> progress = null) {
-            List<Task> tasks = new() {
-                LoadSceneAsync(sceneTo, progress, 0.25f),
-                UnloadSceneLoadables(sceneFrom, progress, 0.25f),
-                UnloadSceneAsync(sceneFrom, progress, 0.25f),
-                SetActiveSceneAsync(sceneTo),
-                LoadSceneLoadables(sceneTo, progress, 0.25f)
-            };
-            foreach (var task in tasks) {
-                await task;
-            }
+        public static async Task TransitionAsync(int? sceneFromBuildIndex, int sceneToBuildIndex, ObservableVariable<float> progress = null) {
+            await LoadSceneAsync(sceneToBuildIndex, progress, 0.25f);
+            await UnloadSceneLoadables(sceneFromBuildIndex, progress, 0.25f);
+            await UnloadSceneAsync(sceneFromBuildIndex, progress, 0.25f);
+            await SetActiveSceneAsync(sceneToBuildIndex);
+            await LoadSceneLoadables(sceneToBuildIndex, progress, 0.25f);
         }
 
-        public static async Task LoadSceneAsync(Scene scene, ObservableVariable<float> progress, float progressIncrement) {
-            await SceneManager.LoadSceneAsync(scene.name, LoadSceneMode.Additive);
+        public static async Task LoadSceneAsync(int sceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
+            await SceneManager.LoadSceneAsync(sceneBuildIndex, LoadSceneMode.Additive);
             progress.Value += progressIncrement;
             await Task.Yield();
         }
 
-        public static async Task UnloadSceneAsync(Scene? scene, ObservableVariable<float> progress, float progressIncrement) {
-            if (scene != null) {
-                await SceneManager.UnloadSceneAsync((Scene)scene);
+        public static async Task UnloadSceneAsync(int? sceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
+            if (sceneBuildIndex != null) {
+                await SceneManager.UnloadSceneAsync(sceneBuildIndex.Value);
             }
             progress.Value += progressIncrement;
             await Task.Yield();
         }
 
-        public static async Task SetActiveSceneAsync(Scene scene) {
+        public static async Task SetActiveSceneAsync(int sceneBuildIndex) {
+            Scene scene = SceneManager.GetSceneByBuildIndex(sceneBuildIndex);
             SceneManager.SetActiveScene(scene);
             await Task.Yield();
         }
 
-        public static async Task LoadSceneLoadables(Scene scene, ObservableVariable<float> progress, float progressIncrement) {
-            var sceneLoadables = GetSceneLoadables(scene);
+        public static async Task LoadSceneLoadables(int sceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
+            var sceneLoadables = GetSceneLoadables(sceneBuildIndex);
+            if (sceneLoadables.Count <= 0) {
+                progress.Value += progressIncrement;
+                await Task.Yield();
+                return;
+            }
             float progressIncrementPerSceneLoadable = (float)(progressIncrement / sceneLoadables.Count);
             for (int i = 0; i < sceneLoadables.Count; i++) {
                 await sceneLoadables[i].LoadAsync();
@@ -47,9 +48,14 @@
             }
         }
 
-        public static async Task UnloadSceneLoadables(Scene? scene, ObservableVariable<float> progress, float progressIncrement) {
-            if (scene != null) {
-                var sceneLoadables = GetSceneLoadables((Scene)scene);
+        public static async Task UnloadSceneLoadables(int? sceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
+            if (sceneBuildIndex != null) {
+                var sceneLoadables = GetSceneLoadables(sceneBuildIndex.Value);
+                if (sceneLoadables.Count <= 0) {
+                    progress.Value += progressIncrement;
+                    await Task.Yield();
+                    return;
+                }
                 float progressIncrementPerSceneLoadable = (float)(progressIncrement / sceneLoadables.Count);
                 for (int i = 0; i < sceneLoadables.Count; i++) {
                     await sceneLoadables[i].UnloadAsync();
@@ -62,7 +68,8 @@
             }
         }
 
-        private static List<ISceneLoadable> GetSceneLoadables(Scene scene) {
+        private static List<ISceneLoadable> GetSceneLoadables(int sceneBuildIndex) {
+            Scene scene = SceneManager.GetSceneByBuildIndex(sceneBuildIndex);
             List<ISceneLoadable> sceneLoadables = new();
             var monoBehaviours = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             foreach (var monoBehaviour in monoBehaviours) {
