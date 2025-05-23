@@ -1,8 +1,8 @@
 ﻿namespace FinnSchuuring.Utilities {
     public enum SceneTransitionEvent {
         BeforeTransitioning,
-        AfterLoadScene,
         AfterUnloadSceneLoadables,
+        AfterLoadScene,
         AfterSetActiveScene,
         AfterUnloadScene,
         AfterLoadSceneLoadables,
