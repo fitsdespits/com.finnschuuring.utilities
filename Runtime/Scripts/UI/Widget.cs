@@ -1,32 +1,150 @@
-﻿namespace FinnSchuuring.Utilities {
+namespace FinnSchuuring.Utilities {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
-    using UnityEngine.EventSystems;
+    using UnityEngine;
 
-    public abstract class Widget : MonoBehaviourAsset, IWidget, IPointerDownHandler, IPointerUpHandler {
-        public void OnPointerDown(PointerEventData eventData) {
-            OnClickDown();
+    public abstract class Widget : MonoBehaviourAsset {
+        [field: SerializeField] public RectTransform ChildContainer { get; private set; } = null;
+        public bool IsEnabled => _isEnabled.HasValue && _isEnabled.Value;
+        public List<Widget> ChildWidgets { get; private set; } = new();
+        public GameObject Prototype { get; private set; } = null;
+
+        private bool? _isEnabled = null;
+
+        public async Task<bool> TryEnableAsync() {
+            if (_isEnabled.HasValue && _isEnabled.Value) {
+                return false;
+            }
+            _isEnabled = true;
+            await OnEnableAsync();
+            return true;
         }
 
-        public void OnPointerUp(PointerEventData eventData) {
-            OnClickUp();
+        public async Task<bool> TryDisableAsync() {
+            if (_isEnabled.HasValue && !_isEnabled.Value) {
+                return false;
+            }
+            _isEnabled = false;
+            await OnDisableAsync();
+            return true;
         }
 
-        public virtual Task EnableAsync() {
+        public virtual async Task OnEnableAsync() {
             gameObject.SetActive(true);
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        public virtual Task DisableAsync() {
+        public virtual async Task OnDisableAsync() {
             gameObject.SetActive(false);
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        public virtual void OnClickDown() {
-
+        public void CreatePrototype(GameObject gameObject) {
+            Prototype = Instantiate(gameObject, transform);
+            Prototype.name = gameObject.name;
+            Prototype.SetActive(false);
         }
 
-        public virtual void OnClickUp() {
+        public Widget AddChildWidget(GameObject gameObject) {
+            Widget widget = Instantiate(gameObject, GetChildContainer()).GetComponent<Widget>();
+            widget.gameObject.SetActive(true);
+            ChildWidgets.Add(widget);
+            return widget;
+        }
 
+        public void RemoveChildWidget(Widget widget) {
+            ChildWidgets.Remove(widget);
+            Destroy(widget.gameObject);
+        }
+
+        public List<T> GetChildWidgetsAsType<T>() where T : Widget {
+            List<T> childWidgets = new();
+            foreach (var childWidget in ChildWidgets) {
+                childWidgets.Add(childWidget as T);
+            }
+            return childWidgets;
+        }
+
+        public void DisableAllExceptChildContainer() {
+            foreach (Transform childTransform in transform) {
+                if (childTransform != ChildContainer) {
+                    childTransform.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        public void AlignChildWidgetsSingleAxis(WidgetAlignmentMode mode, float spacing) {
+            switch (mode) {
+                case WidgetAlignmentMode.DirectionalUp:
+                    AlignChildWidgetsSingleAxis(Vector2.up, spacing, false);
+                    break;
+                case WidgetAlignmentMode.DirectionalDown:
+                    AlignChildWidgetsSingleAxis(Vector2.down, spacing, false);
+                    break;
+                case WidgetAlignmentMode.DirectionalLeft:
+                    AlignChildWidgetsSingleAxis(Vector2.left, spacing, false);
+                    break;
+                case WidgetAlignmentMode.DirectionalRight:
+                    AlignChildWidgetsSingleAxis(Vector2.right, spacing, false);
+                    break;
+                case WidgetAlignmentMode.CenteredHorizontal:
+                    AlignChildWidgetsSingleAxis(Vector2.right, spacing, true);
+                    break;
+                case WidgetAlignmentMode.CenteredVertical:
+                    AlignChildWidgetsSingleAxis(Vector2.up, spacing, true);
+                    break;
+            }
+        }
+
+        public void AlignChildWidgetsDoubleAxis(WidgetAlignmentMode xMode, WidgetAlignmentMode yMode, WidgetSortMode sortMode, int itemsPerRow, float xSpacing, float ySpacing) {
+            int count = ChildWidgets.Count;
+            int rows = Mathf.CeilToInt(count / (float)itemsPerRow);
+
+            float totalWidth = (itemsPerRow - 1) * xSpacing;
+            float totalHeight = (rows - 1) * ySpacing;
+            float xStart = xMode == WidgetAlignmentMode.CenteredHorizontal ? -totalWidth / 2f : 0f;
+            float yStart = yMode == WidgetAlignmentMode.CenteredVertical ? -totalHeight / 2f : 0f;
+
+            for (int i = 0; i < count; i++) {
+                int col = i % itemsPerRow;
+                int row = i / itemsPerRow;
+
+                if (sortMode == WidgetSortMode.Descending) {
+                    row = rows - 1 - row;
+                }
+
+                float x = xStart + col * xSpacing;
+                float y = yStart + row * ySpacing;
+
+                if (xMode == WidgetAlignmentMode.DirectionalLeft) x = -col * xSpacing;
+                if (xMode == WidgetAlignmentMode.DirectionalRight) x = col * xSpacing;
+                if (yMode == WidgetAlignmentMode.DirectionalDown) y = -row * ySpacing;
+                if (yMode == WidgetAlignmentMode.DirectionalUp) y = row * ySpacing;
+
+                ChildWidgets[i].transform.localPosition = new(x, y, 0f);
+            }
+        }
+
+        private void AlignChildWidgetsSingleAxis(Vector2 direction, float spacing, bool centered) {
+            int count = ChildWidgets.Count;
+            float totalLength = (count - 1) * spacing;
+            Vector2 startOffset = centered ? -0.5f * totalLength * direction : Vector2.zero;
+
+            for (int i = 0; i < count; i++) {
+                Vector2 localPos = startOffset + i * spacing * direction;
+                ChildWidgets[i].transform.localPosition = new(localPos.x, localPos.y, 0f);
+            }
+        }
+
+        private RectTransform GetChildContainer() {
+            if (ChildContainer == null) {
+                GameObject childContainerObject = new() {
+                    name = "ContainerChild"
+                };
+                childContainerObject.transform.SetParent(transform, false);
+                ChildContainer = childContainerObject.AddComponent(typeof(RectTransform)) as RectTransform;
+            }
+            return ChildContainer;
         }
     }
 }
