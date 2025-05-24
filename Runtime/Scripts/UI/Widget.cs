@@ -6,43 +6,52 @@ namespace FinnSchuuring.Utilities {
 
     public abstract class Widget : MonoBehaviourAsset, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler {
         [field: SerializeField] public RectTransform ChildContainer { get; private set; } = null;
-        public bool IsEnabled => _isEnabled.HasValue && _isEnabled.Value;
+        public bool? IsEnabled { get; private set; } = null;
+        public bool IsChangingEnabledState { get; private set; } = false;
         public List<Widget> ChildWidgets { get; private set; } = new();
         public GameObject Prototype { get; private set; } = null;
 
-        private bool? _isEnabled = null;
-
         public void OnPointerDown(PointerEventData eventData) {
-            OnCursorDown();
+            OnPointerDown();
         }
 
         public void OnPointerUp(PointerEventData eventData) {
-            OnCursorUp();
+            OnPointerUp();
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
-            OnCursorEnter();
+            OnPointerEnter();
         }
 
         public void OnPointerExit(PointerEventData eventData) {
-            OnCursorExit();
+            OnPointerExit();
         }
 
         public async Task<bool> TryEnableAsync() {
-            if (_isEnabled.HasValue && _isEnabled.Value) {
+            if (IsChangingEnabledState) {
                 return false;
             }
-            _isEnabled = true;
+            if (IsEnabled.HasValue && IsEnabled.Value) {
+                return false;
+            }
+            IsChangingEnabledState = true;
             await OnEnableAsync();
+            IsEnabled = true;
+            IsChangingEnabledState = false;
             return true;
         }
 
         public async Task<bool> TryDisableAsync() {
-            if (_isEnabled.HasValue && !_isEnabled.Value) {
+            if (IsChangingEnabledState) {
                 return false;
             }
-            _isEnabled = false;
+            if (IsEnabled.HasValue && !IsEnabled.Value) {
+                return false;
+            }
+            IsChangingEnabledState = true;
             await OnDisableAsync();
+            IsEnabled = false;
+            IsChangingEnabledState = false;
             return true;
         }
 
@@ -164,19 +173,19 @@ namespace FinnSchuuring.Utilities {
             await Task.CompletedTask;
         }
 
-        public virtual void OnCursorDown() {
+        public virtual void OnPointerDown() {
 
         }
 
-        public virtual void OnCursorUp() {
+        public virtual void OnPointerUp() {
 
         }
 
-        public virtual void OnCursorEnter() {
+        public virtual void OnPointerEnter() {
 
         }
 
-        public virtual void OnCursorExit() {
+        public virtual void OnPointerExit() {
 
         }
     }
