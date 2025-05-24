@@ -2,14 +2,31 @@ namespace FinnSchuuring.Utilities {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using UnityEngine;
+    using UnityEngine.EventSystems;
 
-    public abstract class Widget : MonoBehaviourAsset {
+    public abstract class Widget : MonoBehaviourAsset, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler {
         [field: SerializeField] public RectTransform ChildContainer { get; private set; } = null;
         public bool IsEnabled => _isEnabled.HasValue && _isEnabled.Value;
         public List<Widget> ChildWidgets { get; private set; } = new();
         public GameObject Prototype { get; private set; } = null;
 
         private bool? _isEnabled = null;
+
+        public void OnPointerDown(PointerEventData eventData) {
+            OnCursorDown();
+        }
+
+        public void OnPointerUp(PointerEventData eventData) {
+            OnCursorUp();
+        }
+
+        public void OnPointerEnter(PointerEventData eventData) {
+            OnCursorEnter();
+        }
+
+        public void OnPointerExit(PointerEventData eventData) {
+            OnCursorExit();
+        }
 
         public async Task<bool> TryEnableAsync() {
             if (_isEnabled.HasValue && _isEnabled.Value) {
@@ -27,16 +44,6 @@ namespace FinnSchuuring.Utilities {
             _isEnabled = false;
             await OnDisableAsync();
             return true;
-        }
-
-        public virtual async Task OnEnableAsync() {
-            gameObject.SetActive(true);
-            await Task.CompletedTask;
-        }
-
-        public virtual async Task OnDisableAsync() {
-            gameObject.SetActive(false);
-            await Task.CompletedTask;
         }
 
         public void CreatePrototype(GameObject gameObject) {
@@ -145,6 +152,32 @@ namespace FinnSchuuring.Utilities {
                 ChildContainer = childContainerObject.AddComponent(typeof(RectTransform)) as RectTransform;
             }
             return ChildContainer;
+        }
+
+        public virtual async Task OnEnableAsync() {
+            gameObject.SetActive(true);
+            await Task.CompletedTask;
+        }
+
+        public virtual async Task OnDisableAsync() {
+            gameObject.SetActive(false);
+            await Task.CompletedTask;
+        }
+
+        public virtual void OnCursorDown() {
+
+        }
+
+        public virtual void OnCursorUp() {
+
+        }
+
+        public virtual void OnCursorEnter() {
+
+        }
+
+        public virtual void OnCursorExit() {
+
         }
     }
 }
