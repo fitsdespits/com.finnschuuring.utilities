@@ -1,5 +1,5 @@
 ﻿namespace FinnSchuuring.Utilities {
-    public enum WidgetSortMode {
+    public enum WidgetOrderMode {
         Ascending,
         Descending,
     }

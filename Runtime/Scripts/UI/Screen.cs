@@ -19,6 +19,8 @@
 
         [SerializeField] private bool enableOnLoad = true;
 
+        private bool _isLoaded = false;
+
         public async Task LoadAsync() {
             await OnLoadAsync();
             if (enableOnLoad) {
@@ -26,9 +28,13 @@
             } else {
                 await TryDisableAsync();
             }
+            _isLoaded = true;
         }
 
         public async Task UnloadAsync() {
+            if (!_isLoaded) {
+                return;
+            }
             await OnUnloadAsync();
             await TryDisableAsync();
         }

@@ -46,7 +46,7 @@
         }
 
         private static async Task LoadSceneLoadablesAsync(int? fromSceneBuildIndex, int toSceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
-            var sceneLoadables = await GetSceneLoadablesAsync(toSceneBuildIndex);
+            var sceneLoadables = GetSceneLoadables(toSceneBuildIndex);
             if (sceneLoadables.Count <= 0) {
                 progress.Value += progressIncrement;
                 return;
@@ -55,13 +55,12 @@
             for (int i = 0; i < sceneLoadables.Count; i++) {
                 await sceneLoadables[i].LoadAsync();
                 progress.Value += progressIncrementPerSceneLoadable;
-                await Task.Yield();
             }
         }
 
         private static async Task UnloadSceneLoadablesAsync(int? fromSceneBuildIndex, int toSceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
             if (fromSceneBuildIndex != null) {
-                var sceneLoadables = await GetSceneLoadablesAsync(fromSceneBuildIndex.Value);
+                var sceneLoadables = GetSceneLoadables(fromSceneBuildIndex.Value);
                 if (sceneLoadables.Count <= 0) {
                     progress.Value += progressIncrement;
                     return;
@@ -70,7 +69,6 @@
                 for (int i = 0; i < sceneLoadables.Count; i++) {
                     await sceneLoadables[i].UnloadAsync();
                     progress.Value += progressIncrementPerSceneLoadable;
-                    await Task.Yield();
                 }
             } else {
                 progress.Value += progressIncrement;
@@ -99,7 +97,7 @@
             return mergedPasses;
         }
 
-        private static async Task<List<ISceneLoadable>> GetSceneLoadablesAsync(int sceneBuildIndex) {
+        private static List<ISceneLoadable> GetSceneLoadables(int sceneBuildIndex) {
             Scene scene = SceneManager.GetSceneByBuildIndex(sceneBuildIndex);
             List<ISceneLoadable> sceneLoadables = new();
             var monoBehaviours = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
@@ -109,7 +107,6 @@
                         sceneLoadables.Add(sceneLoadable);
                     }
                 }
-                await Task.Yield();
             }
             return sceneLoadables;
         }

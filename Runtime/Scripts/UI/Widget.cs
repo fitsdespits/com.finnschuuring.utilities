@@ -96,20 +96,20 @@ namespace FinnSchuuring.Utilities {
             }
         }
 
-        public void AlignChildWidgetsDoubleAxis(WidgetAlignmentMode xMode, WidgetAlignmentMode yMode, WidgetSortMode sortMode, int itemsPerRow, float xSpacing, float ySpacing) {
+        public void AlignChildWidgetsDoubleAxis(WidgetAlignmentMode xMode, WidgetAlignmentMode yMode, WidgetOrderMode orderMode, int widgetsPerRow, float xSpacing, float ySpacing) {
             int count = ChildWidgets.Count;
-            int rows = Mathf.CeilToInt(count / (float)itemsPerRow);
+            int rows = Mathf.CeilToInt(count / (float)widgetsPerRow);
 
-            float totalWidth = (itemsPerRow - 1) * xSpacing;
+            float totalWidth = (widgetsPerRow - 1) * xSpacing;
             float totalHeight = (rows - 1) * ySpacing;
             float xStart = xMode == WidgetAlignmentMode.CenteredHorizontal ? -totalWidth / 2f : 0f;
             float yStart = yMode == WidgetAlignmentMode.CenteredVertical ? -totalHeight / 2f : 0f;
 
             for (int i = 0; i < count; i++) {
-                int col = i % itemsPerRow;
-                int row = i / itemsPerRow;
+                int col = i % widgetsPerRow;
+                int row = i / widgetsPerRow;
 
-                if (sortMode == WidgetSortMode.Descending) {
+                if (orderMode == WidgetOrderMode.Descending) {
                     row = rows - 1 - row;
                 }
 
