@@ -25,13 +25,14 @@
 
         public override async Task OnEnableAsync() {
             gameObject.SetActive(true);
-            await Task.Delay(100);
-            await canvasGroup.DOFade(1.0f, 0.1f).AsyncWaitForCompletion();
+            canvasGroup.alpha = 1f;
+            await Task.CompletedTask;
         }
 
         public override async Task OnDisableAsync() {
-            await canvasGroup.DOFade(0.0f, 0.1f).AsyncWaitForCompletion();
+            canvasGroup.alpha = 0f;
             gameObject.SetActive(false);
+            await Task.CompletedTask;
         }
 
         public void InitializeAsChild(MenuAsset asset, MenuWidget parent, RectTransform container) {
