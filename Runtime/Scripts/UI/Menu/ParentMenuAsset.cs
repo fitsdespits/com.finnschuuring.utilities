@@ -4,6 +4,7 @@
 
     [CreateAssetMenu(menuName = "Menu/Parent")]
     public class ParentMenuAsset : MenuAsset {
+        [field: Header("ParentMenuAsset")]
         [field: SerializeField] public List<MenuAsset> Children { get; set; } = new();
 
         public override void InitializeWidget(MenuWidget widget) {
@@ -24,6 +25,9 @@
 
         private void HandleCursorDown(MenuWidget widget) {
             if (widget.IsChangingEnabledState) {
+                return;
+            }
+            if (widget.Parent == null) {
                 return;
             }
             foreach (var childWidget in widget.Parent.ChildWidgets) {

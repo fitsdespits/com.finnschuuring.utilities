@@ -5,6 +5,7 @@
     using UnityEngine;
 
     public class MenuWidget : Screen<MenuWidget> {
+        [field: Header("MenuWidget")]
         [field: SerializeField] public WidgetAlignmentMode AlignmentMode { get; private set; } = WidgetAlignmentMode.DirectionalDown;
         [field: SerializeField] public float Spacing { get; private set; } = 100f;
 
@@ -13,7 +14,7 @@
         public SortedEvent<MenuWidget> OnCursorDown { get; private set; } = new();
 
         [SerializeField] private ParentMenuAsset parentAsset = null;
-        [SerializeField] private TMP_Text textRenderer = null;
+        [SerializeField] private TMP_Text nameRenderer = null;
         [SerializeField] private CanvasGroup canvasGroup = null;
 
         public override async Task OnLoadAsync() {
@@ -42,7 +43,7 @@
             if (Parent.Parent != null) {
                 _ = TryDisableAsync();
             }
-            textRenderer.text = Asset.Name;
+            nameRenderer.text = Asset.Name;
         }
 
         public override void OnPointerDown() {

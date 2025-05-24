@@ -17,6 +17,7 @@
 
         private static T _instance = null;
 
+        [Header("Screen")]
         [SerializeField] private bool enableOnLoad = true;
 
         private bool _isLoaded = false;

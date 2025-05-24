@@ -4,6 +4,7 @@
     public abstract class MenuAsset : ScriptableObjectAsset {
         public override bool IsInstantiatable => false;
 
+        [field: Header("MenuAsset")]
         [field: SerializeField] public string Name { get; set; } = "Option";
         [field: SerializeField] public GameObject OverridePrefab { get; private set; } = null;
 
