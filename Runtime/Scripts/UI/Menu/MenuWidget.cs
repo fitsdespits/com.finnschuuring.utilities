@@ -1,5 +1,4 @@
 ﻿namespace FinnSchuuring.Utilities {
-    using DG.Tweening;
     using System.Threading.Tasks;
     using TMPro;
     using UnityEngine;

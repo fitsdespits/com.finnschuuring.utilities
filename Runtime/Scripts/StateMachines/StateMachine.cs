@@ -3,7 +3,7 @@
     using UnityEngine;
 
     public abstract class StateMachine : State {
-        protected State CurrentState { get; private set; } = null;
+        public State CurrentState { get; private set; } = null;
         public SortedEvent<State> OnStateChanged { get; private set; } = new();
 
         protected readonly List<State> _states = new();
