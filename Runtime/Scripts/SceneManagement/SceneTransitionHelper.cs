@@ -26,6 +26,20 @@
             }
         }
 
+        public static List<ISceneLoadable> GetSceneLoadables(int sceneBuildIndex) {
+            Scene scene = SceneManager.GetSceneByBuildIndex(sceneBuildIndex);
+            List<ISceneLoadable> sceneLoadables = new();
+            var monoBehaviours = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+            foreach (var monoBehaviour in monoBehaviours) {
+                if (monoBehaviour.gameObject.scene == scene) {
+                    if (monoBehaviour is ISceneLoadable sceneLoadable) {
+                        sceneLoadables.Add(sceneLoadable);
+                    }
+                }
+            }
+            return sceneLoadables;
+        }
+
         private static async Task LoadSceneAsync(int? fromSceneBuildIndex, int toSceneBuildIndex, ObservableVariable<float> progress, float progressIncrement) {
             await SceneManager.LoadSceneAsync(toSceneBuildIndex, LoadSceneMode.Additive);
             progress.Value += progressIncrement;
@@ -95,20 +109,6 @@
                 }
             }
             return mergedPasses;
-        }
-
-        private static List<ISceneLoadable> GetSceneLoadables(int sceneBuildIndex) {
-            Scene scene = SceneManager.GetSceneByBuildIndex(sceneBuildIndex);
-            List<ISceneLoadable> sceneLoadables = new();
-            var monoBehaviours = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            foreach (var monoBehaviour in monoBehaviours) {
-                if (monoBehaviour.gameObject.scene == scene) {
-                    if (monoBehaviour is ISceneLoadable sceneLoadable) {
-                        sceneLoadables.Add(sceneLoadable);
-                    }
-                }
-            }
-            return sceneLoadables;
         }
     }
 }
