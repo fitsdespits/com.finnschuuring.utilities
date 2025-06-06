@@ -6,7 +6,7 @@ namespace FinnSchuuring.Utilities {
 
     public abstract class Widget : MonoBehaviourAsset, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler {
         [field: Header("Widget")]
-        [field: SerializeField] public RectTransform ChildContainer { get; private set; } = null;
+        [field: SerializeField] public RectTransform ChildContainer { get; set; } = null;
         public bool? IsEnabled { get; private set; } = null;
         public bool IsChangingEnabledState { get; private set; } = false;
         public List<Widget> ChildWidgets { get; private set; } = new();
