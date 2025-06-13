@@ -23,6 +23,7 @@
         private bool _isLoaded = false;
 
         public async Task LoadAsync() {
+            _ = Instance;
             await OnLoadAsync();
             if (enableOnLoad) {
                 await TryEnableAsync();
