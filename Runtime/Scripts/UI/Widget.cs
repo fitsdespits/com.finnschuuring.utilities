@@ -4,28 +4,21 @@ namespace FinnSchuuring.Utilities {
     using UnityEngine;
     using UnityEngine.EventSystems;
 
-    public abstract class Widget : MonoBehaviourAsset, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler {
+    public abstract class Widget : MonoBehaviourAsset, IPointerEnterHandler, IPointerExitHandler, ISmartCursorObject {
         [field: Header("Widget")]
+        [field: SerializeField] public SmartCursorSettings SmartCursorSettings { get; private set; } = new();
         [field: SerializeField] public RectTransform ChildContainer { get; set; } = null;
         public bool? IsEnabled { get; private set; } = null;
         public bool IsChangingEnabledState { get; private set; } = false;
         public List<Widget> ChildWidgets { get; private set; } = new();
         public GameObject Prototype { get; private set; } = null;
 
-        public void OnPointerDown(PointerEventData eventData) {
-            OnPointerDown();
-        }
-
-        public void OnPointerUp(PointerEventData eventData) {
-            OnPointerUp();
-        }
-
         public void OnPointerEnter(PointerEventData eventData) {
-            OnPointerEnter();
+            SmartCursor.Instance.TryEnterManual(this);
         }
 
         public void OnPointerExit(PointerEventData eventData) {
-            OnPointerExit();
+            SmartCursor.Instance.TryExitManual(this);
         }
 
         public async Task<bool> TryEnableAsync() {
@@ -174,19 +167,19 @@ namespace FinnSchuuring.Utilities {
             await Task.CompletedTask;
         }
 
-        public virtual void OnPointerDown() {
+        public virtual void OnSmartCursorDown() {
 
         }
 
-        public virtual void OnPointerUp() {
+        public virtual void OnSmartCursorUp() {
 
         }
 
-        public virtual void OnPointerEnter() {
+        public virtual void OnSmartCursorEnter() {
 
         }
 
-        public virtual void OnPointerExit() {
+        public virtual void OnSmartCursorExit() {
 
         }
     }

@@ -46,7 +46,7 @@
             nameRenderer.text = Asset.Name;
         }
 
-        public override void OnPointerDown() {
+        public override void OnSmartCursorDown() {
             OnCursorDown.Invoke(this);
         }
 
