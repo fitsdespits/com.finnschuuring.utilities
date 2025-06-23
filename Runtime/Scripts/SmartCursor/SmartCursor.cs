@@ -1,4 +1,5 @@
 namespace FinnSchuuring.Utilities {
+    using Sirenix.Utilities;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
@@ -66,10 +67,8 @@ namespace FinnSchuuring.Utilities {
             if (_enterObjects.Count <= 0) {
                 return;
             }
-            _enterObjects = _enterObjects
-            .OrderBy(x => _cachedLayerIndexes[x.SmartCursorSettings.Layer])
-            .ThenByDescending(x => x.SmartCursorSettings.OrderInLayer)
-            .ToList();
+            FilterAllObjects();
+            _enterObjects = SortObjects(_enterObjects);
             foreach (var obj in _enterObjects) {
                 obj.OnSmartCursorDown();
                 _downObjects.Add(obj);
@@ -80,6 +79,7 @@ namespace FinnSchuuring.Utilities {
         }
 
         public void CursorUp() {
+            FilterAllObjects();
             foreach (var obj in _downObjects) {
                 obj.OnSmartCursorUp();
             }
@@ -113,6 +113,30 @@ namespace FinnSchuuring.Utilities {
             _enterObjects.Remove(obj);
             _enterManualObjects.Remove(obj);
             return true;
+        }
+
+        private void FilterAllObjects() {
+            _enterObjects = FilterObjects(_enterObjects);
+            _enterManualObjects = FilterObjects(_enterManualObjects);
+            _downObjects = FilterObjects(_downObjects);
+        }
+
+        private List<ISmartCursorObject> SortObjects(List<ISmartCursorObject> objects) {
+            objects = objects
+            .OrderBy(x => _cachedLayerIndexes[x.SmartCursorSettings.Layer])
+            .ThenByDescending(x => x.SmartCursorSettings.OrderInLayer)
+            .ToList();
+            return objects;
+        }
+
+        private List<ISmartCursorObject> FilterObjects(List<ISmartCursorObject> objects) {
+            List<ISmartCursorObject> objectsToKeep = new();
+            foreach (ISmartCursorObject obj in objects) {
+                if ((Object)obj != null) {
+                    objectsToKeep.Add(obj);
+                }
+            }
+            return objectsToKeep;
         }
     }
 }
