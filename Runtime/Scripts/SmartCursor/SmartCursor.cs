@@ -1,10 +1,12 @@
 namespace FinnSchuuring.Utilities {
-    using Sirenix.Utilities;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
 
     public class SmartCursor : MonoBehaviourSingleton<SmartCursor> {
+        public SortedEvent<ISmartCursorObject> OnObjectEntered { get; private set; } = new();
+        public SortedEvent<ISmartCursorObject> OnObjectExited { get; private set; } = new();
+
         private Dictionary<SmartCursorLayerAsset, int> _cachedLayerIndexes = null;
         private List<ISmartCursorObject> _enterObjects = new();
         private List<ISmartCursorObject> _enterManualObjects = new();
@@ -12,6 +14,8 @@ namespace FinnSchuuring.Utilities {
         private float _elapsedRaycastUpdateStepDuration = 0f;
 
         public void Clear() {
+            OnObjectEntered.UnsubscribeAll();
+            OnObjectExited.UnsubscribeAll();
             _cachedLayerIndexes.Clear();
             _enterObjects.Clear();
             _enterManualObjects.Clear();
@@ -24,6 +28,16 @@ namespace FinnSchuuring.Utilities {
             for (int i = 0; i < SmartCursorLibrary.Instance.Layers.Count; i++) {
                 _cachedLayerIndexes.Add(SmartCursorLibrary.Instance.Layers[i], i);
             }
+        }
+
+        public List<T> GetEnteredObjectsOfType<T>() where T : ISmartCursorObject {
+            List<T> objectsOfType = new();
+            foreach (var obj in _enterObjects) {
+                if (obj is T objectOfType) {
+                    objectsOfType.Add(objectOfType);
+                }
+            }
+            return objectsOfType;
         }
 
         public void UpdateEnterAndExitAuto(Camera camera) {
@@ -49,17 +63,6 @@ namespace FinnSchuuring.Utilities {
                 if (!_enterManualObjects.Contains(obj)) {
                     TryExit(obj);
                 }
-            }
-        }
-
-        public void SimulateClick(List<ISmartCursorObject> injectedObjects) {
-            foreach (var obj in injectedObjects) {
-                TryEnterManual(obj);
-            }
-            CursorDown();
-            CursorUp();
-            foreach (var obj in injectedObjects) {
-                TryExitManual(obj);
             }
         }
 
@@ -103,6 +106,7 @@ namespace FinnSchuuring.Utilities {
                 return false;
             }
             _enterObjects.Add(obj);
+            OnObjectEntered.Invoke(obj);
             return true;
         }
 
@@ -112,6 +116,7 @@ namespace FinnSchuuring.Utilities {
             }
             _enterObjects.Remove(obj);
             _enterManualObjects.Remove(obj);
+            OnObjectExited.Invoke(obj);
             return true;
         }
 
@@ -137,6 +142,11 @@ namespace FinnSchuuring.Utilities {
                 }
             }
             return objectsToKeep;
+        }
+
+        private void OnDestroy() {
+            OnObjectEntered.UnsubscribeAll();
+            OnObjectExited.UnsubscribeAll();
         }
     }
 }
