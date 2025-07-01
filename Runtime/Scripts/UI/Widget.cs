@@ -168,7 +168,9 @@ namespace FinnSchuuring.Utilities {
         }
 
         private void OnDestroy() {
-            SmartCursor.Instance.TryExitManual(this);
+            if (SmartCursor.Instance != null) {
+                SmartCursor.Instance.TryExitManual(this);
+            }
         }
 
         public virtual void OnSmartCursorDown() {
