@@ -167,6 +167,10 @@ namespace FinnSchuuring.Utilities {
             await Task.CompletedTask;
         }
 
+        private void OnDestroy() {
+            SmartCursor.Instance.TryExitManual(this);
+        }
+
         public virtual void OnSmartCursorDown() {
 
         }

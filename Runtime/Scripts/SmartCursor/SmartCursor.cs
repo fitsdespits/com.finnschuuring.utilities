@@ -31,6 +31,7 @@ namespace FinnSchuuring.Utilities {
         }
 
         public List<T> GetEnteredObjectsOfType<T>() where T : ISmartCursorObject {
+            FilterAllObjects();
             List<T> objectsOfType = new();
             foreach (var obj in _enterObjects) {
                 if (obj is T objectOfType) {
