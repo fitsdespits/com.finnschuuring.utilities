@@ -1,5 +1,6 @@
 ﻿namespace FinnSchuuring.Utilities {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.SceneManagement;
@@ -37,6 +38,7 @@
                     }
                 }
             }
+            sceneLoadables = sceneLoadables.OrderByDescending(sceneloadable => sceneloadable.LoadPriority).ToList();
             return sceneLoadables;
         }
 

@@ -17,7 +17,9 @@
 
         private static T _instance = null;
 
-        [Header("Screen")]
+        [field: Header("Screen")]
+        [field: SerializeField] public int LoadPriority { get; private set; } = 0;
+
         [SerializeField] private bool enableOnLoad = true;
 
         private bool _isLoaded = false;
