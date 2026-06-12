@@ -1,5 +1,5 @@
 ﻿namespace FinnSchuuring.Utilities {
-    using System.Threading.Tasks;
+    using Cysharp.Threading.Tasks;
     using TMPro;
     using UnityEngine;
 
@@ -16,22 +16,22 @@
         [SerializeField] private TMP_Text nameRenderer = null;
         [SerializeField] private CanvasGroup canvasGroup = null;
 
-        public override async Task OnLoadAsync() {
+        public override async UniTask OnLoadAsync() {
             parentAsset.InitializeWidget(this);
             DisableAllExceptChildContainer();
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
-        public override async Task OnEnableAsync() {
+        public override async UniTask OnEnableAsync() {
             gameObject.SetActive(true);
             canvasGroup.alpha = 1f;
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
-        public override async Task OnDisableAsync() {
+        public override async UniTask OnDisableAsync() {
             canvasGroup.alpha = 0f;
             gameObject.SetActive(false);
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
         public void InitializeAsChild(MenuAsset asset, MenuWidget parent, RectTransform container) {

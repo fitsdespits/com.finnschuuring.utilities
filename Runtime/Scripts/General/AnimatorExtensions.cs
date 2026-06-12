@@ -1,18 +1,18 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public static class AnimatorExtensions {
-    public static async Task WaitForCompletionAsync(this Animator animator, string trigger) {
+    public static async UniTask ToUniTask(this Animator animator, string trigger) {
         if (animator == null || string.IsNullOrEmpty(trigger)) {
             Debug.LogWarning("Animator or trigger is null/empty.");
             return;
         }
         animator.SetTrigger(trigger);
         while (!IsAnimatorPlaying(animator)) {
-            await Task.Yield();
+            await UniTask.Yield();
         }
         while (IsAnimatorPlaying(animator)) {
-            await Task.Yield();
+            await UniTask.Yield();
         }
     }
 

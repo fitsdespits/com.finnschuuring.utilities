@@ -1,11 +1,11 @@
 ﻿namespace FinnSchuuring.Utilities {
     public class SceneTransitionPass {
         public SceneTransitionEvent Event { get; private set; } = SceneTransitionEvent.BeforeTransitioning;
-        public SceneTransitionTaskDelegate Task { get; private set; } = null;
+        public SceneTransitionTaskDelegate UniTask { get; private set; } = null;
 
-        public SceneTransitionPass(SceneTransitionEvent sceneEvent, SceneTransitionTaskDelegate task) {
+        public SceneTransitionPass(SceneTransitionEvent sceneEvent, SceneTransitionTaskDelegate uniTask) {
             Event = sceneEvent;
-            Task = task;
+            UniTask = uniTask;
         }
     }
 }

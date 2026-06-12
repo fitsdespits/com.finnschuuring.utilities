@@ -1,5 +1,5 @@
 ﻿namespace FinnSchuuring.Utilities {
-    using System.Threading.Tasks;
+    using Cysharp.Threading.Tasks;
     using UnityEngine;
 
     public abstract class Screen<T> : Widget, ISceneLoadable where T : Screen<T> {
@@ -24,7 +24,7 @@
 
         private bool _isLoaded = false;
 
-        public async Task LoadAsync() {
+        public async UniTask LoadAsync() {
             _ = Instance;
             await OnLoadAsync();
             if (enableOnLoad) {
@@ -35,7 +35,7 @@
             _isLoaded = true;
         }
 
-        public async Task UnloadAsync() {
+        public async UniTask UnloadAsync() {
             if (!_isLoaded) {
                 return;
             }
@@ -43,12 +43,12 @@
             await TryDisableAsync();
         }
 
-        public virtual async Task OnLoadAsync() {
-            await Task.CompletedTask;
+        public virtual async UniTask OnLoadAsync() {
+            await UniTask.CompletedTask;
         }
 
-        public virtual async Task OnUnloadAsync() {
-            await Task.CompletedTask;
+        public virtual async UniTask OnUnloadAsync() {
+            await UniTask.CompletedTask;
         }
     }
 }

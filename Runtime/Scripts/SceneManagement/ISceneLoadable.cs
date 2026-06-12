@@ -1,11 +1,11 @@
 ﻿namespace FinnSchuuring.Utilities {
-    using System.Threading.Tasks;
+    using Cysharp.Threading.Tasks;
 
     public interface ISceneLoadable {
         public int LoadPriority { get; }
 
-        public Task LoadAsync();
+        public UniTask LoadAsync();
 
-        public Task UnloadAsync();
+        public UniTask UnloadAsync();
     }
 }

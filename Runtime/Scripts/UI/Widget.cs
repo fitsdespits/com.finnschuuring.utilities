@@ -1,6 +1,6 @@
 namespace FinnSchuuring.Utilities {
     using System.Collections.Generic;
-    using System.Threading.Tasks;
+    using Cysharp.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.EventSystems;
 
@@ -21,7 +21,7 @@ namespace FinnSchuuring.Utilities {
             SmartCursor.Instance.TryExitManual(this);
         }
 
-        public async Task<bool> TryEnableAsync() {
+        public async UniTask<bool> TryEnableAsync() {
             if (IsChangingEnabledState) {
                 return false;
             }
@@ -35,7 +35,7 @@ namespace FinnSchuuring.Utilities {
             return true;
         }
 
-        public async Task<bool> TryDisableAsync() {
+        public async UniTask<bool> TryDisableAsync() {
             if (IsChangingEnabledState) {
                 return false;
             }
@@ -157,14 +157,14 @@ namespace FinnSchuuring.Utilities {
             return ChildContainer;
         }
 
-        public virtual async Task OnEnableAsync() {
+        public virtual async UniTask OnEnableAsync() {
             gameObject.SetActive(true);
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
-        public virtual async Task OnDisableAsync() {
+        public virtual async UniTask OnDisableAsync() {
             gameObject.SetActive(false);
-            await Task.CompletedTask;
+            await UniTask.CompletedTask;
         }
 
         public virtual void OnSmartCursorDown() {

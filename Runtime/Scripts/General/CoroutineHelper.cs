@@ -1,16 +1,16 @@
 ﻿using System.Collections;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public static class CoroutineHelper {
-    public static Task CoroutineTask(MonoBehaviour gameObject, IEnumerator coroutine) {
-        var task = new TaskCompletionSource<bool>();
-        gameObject.StartCoroutine(WaitForCompletion(coroutine, task));
-        return task.Task;
+    public static UniTask CoroutineTask(MonoBehaviour gameObject, IEnumerator coroutine) {
+        var uniTask = new UniTaskCompletionSource<bool>();
+        gameObject.StartCoroutine(WaitForCompletion(coroutine, uniTask));
+        return uniTask.Task;
     }
 
-    private static IEnumerator WaitForCompletion(IEnumerator coroutine, TaskCompletionSource<bool> task) {
+    private static IEnumerator WaitForCompletion(IEnumerator coroutine, UniTaskCompletionSource<bool> UniTask) {
         yield return coroutine;
-        task.SetResult(true);
+        UniTask.TrySetResult(true);
     }
 }
