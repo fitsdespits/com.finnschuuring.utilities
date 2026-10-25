@@ -16,7 +16,7 @@
                     _instances.Remove(typeof(T));
                     instance = FindFirstObjectByType<T>();
                     instance.name = typeof(T).Name;
-                    _instances.Add(typeof(T), value);
+                    _instances.Add(typeof(T), instance as MonoBehaviourSingleton);
                 }
                 return instance;
             }

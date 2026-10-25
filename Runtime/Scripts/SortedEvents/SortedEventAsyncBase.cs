@@ -4,6 +4,10 @@
     using System.Linq;
     using Cysharp.Threading.Tasks;
 
+    public interface ISortedEventFirstArg<T1> {
+        void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue);
+    }
+
     public class SortedEventAsyncBase<T> {
         protected List<KeyValuePair<T, int>> actions = new();
 
@@ -38,75 +42,111 @@
         }
     }
 
-    public class SortedEventAsync<T> : SortedEventAsyncBase<Func<T, UniTask<bool>>> {
+    public class SortedEventAsync<T> : SortedEventAsyncBase<Func<T, UniTask<bool>>>, ISortedEventFirstArg<T> {
         public async UniTask InvokeAsync(T t) {
             await InvokeInternalAsync(async action => await action(t));
         }
+
+        public void SubscribeFirstArgOnly(Func<T, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe(action, order);
     }
 
-    public class SortedEventAsync<T1, T2> : SortedEventAsyncBase<Func<T1, T2, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2> : SortedEventAsyncBase<Func<T1, T2, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2) {
             await InvokeInternalAsync(async action => await action(t1, t2));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3> : SortedEventAsyncBase<Func<T1, T2, T3, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3> : SortedEventAsyncBase<Func<T1, T2, T3, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4> : SortedEventAsyncBase<Func<T1, T2, T3, T4, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4> : SortedEventAsyncBase<Func<T1, T2, T3, T4, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6, t7));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6, t7, t8));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6, t7, t8, t9));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _, _, _, _, _, _) => action(t1), order);
     }
 
-    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, UniTask<bool>>> {
+    public class SortedEventAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> : SortedEventAsyncBase<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, UniTask<bool>>>, ISortedEventFirstArg<T1> {
         public async UniTask InvokeAsync(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8, T9 t9, T10 t10, T11 t11, T12 t12) {
             await InvokeInternalAsync(async action => await action(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12));
         }
+
+        public void SubscribeFirstArgOnly(Func<T1, UniTask<bool>> action, int order = int.MaxValue) =>
+            Subscribe((t1, _, _, _, _, _, _, _, _, _, _, _) => action(t1), order);
     }
 }
